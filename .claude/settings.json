@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(.venv/bin/python tools/*)",
+      "Bash(bash setup.sh)",
+      "WebSearch",
+      "WebFetch",
+      "mcp__claude-in-chrome__*",
+      "mcp__claude_ai_Gmail__search_*",
+      "mcp__claude_ai_Gmail__get_*",
+      "mcp__claude_ai_Gmail__list_*",
+      "mcp__claude_ai_Gmail__create_draft",
+      "mcp__claude_ai_Indeed__*"
+    ],
+    "deny": [
+      "mcp__claude_ai_Gmail__send_message",
+      "mcp__claude_ai_Gmail__forward"
+    ]
+  }
+}

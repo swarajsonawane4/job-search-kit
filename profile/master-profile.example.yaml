@@ -1,0 +1,123 @@
+# MASTER PROFILE — the only source of facts for every CV, cover letter and form.
+#
+# This is the shared example. setup.sh copies it to profile/master-profile.yaml, which
+# is yours: fill that one in. It is git-ignored, so your details never get pushed.
+#
+# Write everything true here ONCE, in more detail than any CV will ever use.
+# Claude selects, reorders and rephrases from this file. It never adds anything that
+# is not in it. If a posting asks for something that is not here, Claude tells you
+# instead of inventing it — and if it IS true, add it here.
+#
+# Tip: open Claude Code in this folder and say
+#   "Interview me to fill in profile/master-profile.yaml, one section at a time."
+# Do NOT build this from an old PDF CV: that CV is already trimmed and tailored.
+
+contact:
+  name: FIRSTNAME LASTNAME
+  location: City, Country
+  email: you@example.com
+  phone: "+49 000 0000000"
+  phone_split: {country: "+49", number: "0000000000"}   # forms with two fields
+  linkedin: https://www.linkedin.com/in/your-handle
+  github: https://github.com/your-handle
+  address:
+    street: TODO
+    house_number: TODO
+    postal_code: TODO
+    city: TODO
+    country: TODO
+    single_line: TODO
+
+availability:                  # goes onto every application: keep it current
+  confirmed: TODO              # the date you last checked this block, e.g. 2026-10-18
+  from: TODO                   # e.g. 2026-10-01
+  term_time_hours: TODO        # e.g. 20 h/week
+  break_hours: TODO            # e.g. full-time
+  minimum_commitment: TODO     # e.g. 12 months
+  relocation: TODO (e.g. yes, anywhere in Germany)
+  thesis: TODO (e.g. looking for a Masterarbeit from April 2027)
+
+personal:
+  date_of_birth: TODO          # only used when a form insists
+  salutation: TODO
+
+citizenship:
+  country: TODO
+  work_permit: TODO            # e.g. student residence permit, 140 full days/year
+
+salary_expectation: TODO       # hourly rate you ask for. Claude never changes this without asking.
+
+languages:                     # the level on your certificate, not your hope
+  - language: English
+    level: TODO                # e.g. C1
+  - language: German
+    level: TODO                # e.g. B1
+    note: Never claim above this on any CV or form.
+
+education:
+  - institution: University Name
+    degree: M.Sc. Field
+    dates: TODO                # e.g. Apr 2024 – Mar 2027
+    status: enrolled
+    tags: [ml, software]
+    coursework:                # EXACT module titles as printed on your transcript
+      - Introduction to Machine Learning
+    graded_projects: []
+  - institution: University Name
+    degree: B.Sc. Field
+    dates: TODO                # e.g. Oct 2018 – Sep 2021
+    tags: []
+    coursework: []
+
+experience:                    # EVERY paid job. apply.py fails a CV that drops one.
+  - employer: Employer Name
+    role: Job Title
+    dates: TODO                # e.g. Jan 2023 – Dec 2023
+    tags: [python, data]
+    bullets:
+      - strength: strong       # strong | medium | filler
+        text: What you did, with a real number if there is one.
+        evidence: What actually happened, in plain words, so a rephrase can be checked.
+
+projects:
+  - id: project_one
+    name: Project Name
+    stack: [Python, FastAPI]
+    url: https://github.com/your-handle/project
+    tags: [llm, rag]
+    bullets:
+      - strength: strong
+        text: What you built and the measurable result.
+        evidence: How you know the number is true.
+
+skills:                        # level: strong | working | familiar
+  core:
+    level: strong
+    items: [Python]
+  tools:
+    level: working
+    items: [Git, Docker]
+
+certifications: []
+
+# Course names as your CV writes them, mapped to the exact module titles on your
+# transcript. apply.py checks every course the CV names against the transcript and
+# uses this map where the two differ.
+course_aliases: {}
+#   machine learning: [Introduction to Machine Learning]
+
+enrollment_valid_until: TODO   # last day your enrollment certificate is valid, e.g. 2027-03-31
+
+# Things you must NEVER claim, however hard a posting pushes. Claude checks every
+# drafted bullet against this list.
+never_claim:
+  - TODO                       # e.g. German above B1
+  - TODO                       # e.g. Production Kubernetes experience
+
+# Used by tools/referral.py to draft LinkedIn messages in your voice.
+outreach:
+  first_name: FIRSTNAME
+  school: University Name
+  one_line: One sentence on what you build, e.g. "I build LLM agents and test where they break."
+  built: >-
+    Two sentences on your single best project, with one number in them.

@@ -1,0 +1,42 @@
+# Everything personal stays on your machine.
+#
+# The kit ships *.example files; setup.sh makes your own copies from them, and those
+# copies are ignored below. Before every push, run:
+#     .venv/bin/python tools/check_share.py
+# .gitignore only stops files git does not track yet. A file committed earlier stays
+# in the repository until you run: git rm --cached <file>
+
+# Your facts, search settings and watchlist, portal accounts, LinkedIn contacts
+profile/master-profile.yaml
+run.yaml
+portals/accounts.csv
+referrals/contacts.yaml
+
+# Your base CVs, built from your profile in the first session
+tracks/*.tex
+
+# Your documents, applications, saved postings, builds and run logs
+docs/*
+!docs/README.md
+roles/*
+!roles/.keep
+jds/*
+!jds/.keep
+out/*
+!out/_upload/
+out/_upload/*
+!out/_upload/.keep
+runs/*
+!runs/.keep
+
+# Your own Claude Code approvals
+.claude/settings.local.json
+
+# Machine files
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.aux
+*.log
+*.synctex.gz

@@ -1,0 +1,31 @@
+# Referral outreach tracker. Stages and rules: referrals/README.md
+# Drive it with tools/referral.py: it drafts, gates and records. It never sends.
+# Who presses Send is set in run.yaml (linkedin.outreach): send, type or off.
+#
+# route: hiring_team | alumni | peer | recruiter
+# stage: connect -> opener -> culture -> fit -> ask -> thanks -> closed
+# last_reply_sentiment: none | neutral | positive | negative
+#   The stage 5 ask stays blocked until this reads 'positive' and the application
+#   has been submitted.
+#
+# Contacts come from LinkedIn profiles, found by you or by /hunt in your Chrome.
+# Record only what LinkedIn shows publicly for professional contact: name, headline,
+# employer, profile URL, and the checkable reason for reaching out. Nothing else.
+#
+# Finding people: the company People tab works where a job page's "recent hires" panel
+# does not, e.g. /company/<slug>/people/?keywords=working+student
+
+contacts: []
+# - id: acme_jane
+#   name: Jane Doe
+#   first: Jane
+#   title: ML Engineer
+#   employer: ACME GmbH
+#   linkedin: https://www.linkedin.com/in/jane-doe
+#   role: acme_ml            # matches roles/acme_ml.yaml
+#   req: "12345"
+#   route: alumni             # hiring_team | alumni | peer | recruiter
+#   why: Same university, graduated 2023
+#   stage: connect
+#   last_reply_sentiment: none
+#   log: []

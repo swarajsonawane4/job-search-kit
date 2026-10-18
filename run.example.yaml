@@ -1,0 +1,45 @@
+# How /hunt searches and how far one run goes.
+# This is the shared example. setup.sh copies it to run.yaml, which is yours and is
+# git-ignored. Claude fills that one in with you in the first session; edit it any time.
+# The facts about you live in profile/master-profile.yaml, not here.
+
+search:
+  # Each query runs on LinkedIn Jobs and Indeed. Boolean operators work on LinkedIn;
+  # on Indeed, /hunt splits a query into simpler ones. EDIT THESE TO FIT YOU.
+  queries:
+    - '("AI Engineer" OR agentic OR LLM OR RAG) AND ("working student" OR Werkstudent OR intern OR Praktikum OR junior)'
+    - '(<your domain terms>) AND (KI OR AI OR "machine learning" OR ML) AND (Werkstudent OR Praktikum OR intern OR "working student" OR Masterarbeit)'
+  locations: [Germany]            # cities, a country, or remote
+  posted_within_days: 3
+  role_types: [working student, internship, thesis]   # only what you can actually take
+  # Where leads come from. Remove a source to skip it:
+  #   linkedin  - LinkedIn Jobs, in your logged-in Chrome
+  #   indeed    - the Indeed connector, or indeed.com in Chrome
+  #   watchlist - the employers' career pages in search.watchlist below
+  #   alerts    - job-alert emails in your Gmail (StepStone, Xing, LinkedIn, Indeed)
+  sources: [linkedin, indeed, watchlist, alerts]
+  # Employers whose career boards are checked on every run: a name, and the page that
+  # lists their open roles or the board name of a public feed (Greenhouse, Lever,
+  # Ashby, Personio). Add one when a role there looked good; remove one after a
+  # rejection you do not want to revisit.
+  watchlist: []
+  #  - name: Example Employer
+  #    url: https://careers.example.com/jobs
+
+run:
+  roles_per_run: 5        # applications filled up to Submit in one run (/hunt 3 overrides)
+  min_fit_score: 6        # out of 10; a weaker role is reported, never filled
+  contacts_per_role: 2    # people reached on LinkedIn for each role
+
+linkedin:
+  # LinkedIn's User Agreement bans bots and automated messaging, and the account at
+  # risk is yours. These limits keep a run small; at the first CAPTCHA, warning or
+  # limit notice, /hunt stops all LinkedIn actions for that run.
+  account: free           # free | premium. Free: notes up to 200 characters, and only
+                          # a few personalised notes a month; Premium: 300 characters.
+  outreach: send          # send: Claude sends requests and messages from your Chrome
+                          # type: Claude types each message, you press Send
+                          # off:  no outreach at all
+  max_invites_per_run: 10
+  max_messages_per_run: 15
+  max_profile_views_per_run: 40
