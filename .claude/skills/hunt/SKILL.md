@@ -148,11 +148,17 @@ For each selected role, highest score first:
    nice_to_have, required_documents, known_gaps.
 3. Tailor `roles/<role_id>.tex` and write `roles/<role_id>.cover.tex` with the
    resume-tailor skill. Every claim traces to the profile.
-4. `.venv/bin/python tools/apply.py <role_id>` until it prints READY TO SEND, fixing what
+4. **Review.** Hand the role to the `application-reviewer` agent (Agent tool,
+   `subagent_type: application-reviewer`, prompt: the role_id). It reads the posting, the
+   profile and both drafts with fresh eyes, researches the employer, and returns a ranked
+   critique. Fix every MUST FIX. Apply a SHOULD FIX only when it names the profile entry it
+   comes from; never add a fact the profile does not hold. Copy its "Not in the profile"
+   list into the role's `known_gaps`. One review per role; do not loop.
+5. `.venv/bin/python tools/apply.py <role_id>` until it prints READY TO SEND, fixing what
    it reports; `tools/fit_one_page.py <role_id>` when the CV runs long. At most three
    builds; a role still not ready is recorded and gets neither an application nor
    outreach in this run.
-5. Read both PDFs and look at them. Text extraction has called broken PDFs fine.
+6. Read both PDFs and look at them. Text extraction has called broken PDFs fine.
 
 ## Phase 5: Fill the applications
 

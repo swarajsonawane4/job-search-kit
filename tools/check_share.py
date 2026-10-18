@@ -30,10 +30,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PERSONAL = [
     "profile/master-profile.yaml", "run.yaml", "portals/accounts.csv",
     "referrals/contacts.yaml", "tracks/*.tex", "docs/*", "roles/*", "jds/*", "out/*",
-    "runs/*", ".claude/settings.local.json", ".venv/*",
+    "runs/*", "prep/*", ".claude/settings.local.json", ".venv/*",
 ]
 SHARED_EXCEPTIONS = ["docs/README.md", "roles/.keep", "jds/.keep", "out/_upload/.keep",
-                     "runs/.keep"]
+                     "runs/.keep", "prep/.keep"]
 
 # Values that ship in the examples and mean "not filled in yet".
 PLACEHOLDERS = {"", "todo", "firstname lastname", "firstname", "lastname",

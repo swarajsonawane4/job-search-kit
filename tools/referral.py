@@ -101,6 +101,40 @@ def run_config():
         return {}
 
 
+def outreach_mode():
+    """send | type | off, from run.yaml linkedin.outreach. Missing means type."""
+    v = (run_config().get("linkedin") or {}).get("outreach", "type")
+    # YAML reads a bare `off` as the boolean False (and `on` as True), so map those back.
+    if v is False:
+        return "off"
+    if v is None or v is True:
+        return "type"
+    return str(v).strip().lower()
+
+
+def blocked_reason(c, r):
+    """Why nothing may be drafted or recorded for this contact now, or None."""
+    stage = c["stage"]
+    if outreach_mode() == "off":
+        return ("outreach is off in run.yaml (linkedin.outreach: off). "
+                "Nothing is drafted or recorded while it is off.")
+    if stage == "ask" and c.get("last_reply_sentiment") != "positive":
+        return (f"last reply reads '{c.get('last_reply_sentiment', 'none')}', not 'positive'. "
+                "Ask only if the conversation turned out positive; stay at 'fit' or close with 'thanks'.")
+    if stage == "ask" and not submitted(r):
+        return (f"the application for {r.get('role', c.get('role'))} is not submitted. "
+                "Submit it, record submitted: in its role YAML, then draft the ask.")
+    return None
+
+
+def current_draft(c, r):
+    """The text for the contact's current stage and the gate results for it."""
+    stage = c["stage"]
+    text = c.get(f"custom_{stage}") or TEMPLATES[stage](c, r)
+    problems, warnings = gate(text, stage, c)
+    return text, problems, warnings
+
+
 def note_limit():
     account = str((run_config().get("linkedin") or {}).get("account") or "free").lower()
     return NOTE_LIMITS.get(account, NOTE_LIMITS["free"])
@@ -322,20 +356,13 @@ def cmd_draft(data, cid):
         print(f"    tools/referral.py reply {cid} <positive|neutral|negative> \"...\"\n")
         return
 
-    if stage == "ask" and c.get("last_reply_sentiment") != "positive":
-        print(f"\n  BLOCKED — cannot draft the referral ask for {cid}.")
-        print(f"    last reply reads '{c.get('last_reply_sentiment','none')}', not 'positive'.")
-        print("    The rule: ask only if the conversation turned out positive.")
-        print("    Stay at stage 'fit', or close it out with 'thanks'.\n")
-        return
+    reason = blocked_reason(c, r)
+    if reason:
+        print(f"\n  BLOCKED — nothing to draft for {cid}.")
+        print(f"    {reason}\n")
+        sys.exit(1)
 
-    if stage == "ask" and not submitted(r):
-        print(f"\n  BLOCKED — the application for {r.get('role', c.get('role'))} is not submitted.")
-        print("    Submit it, record submitted: in its role YAML, then draft the ask.\n")
-        return
-
-    text = c.get(f"custom_{stage}") or TEMPLATES[stage](c, r)
-    problems, warnings = gate(text, stage, c)
+    text, problems, warnings = current_draft(c, r)
 
     n = STAGES.index(stage) + 1
     where = f"stage {n}/5: {stage}" if n <= 5 else f"after the ask: {stage}"
@@ -354,7 +381,8 @@ def cmd_draft(data, cid):
     for p in problems:
         print(f"  FAIL  {p}")
     if problems:
-        print("\n  NOT READY — fix the above. Nothing may be sent.")
+        print("\n  NOT READY — fix the above. Nothing may be sent.\n")
+        sys.exit(1)
     else:
         print("\n  READY — send exactly this (run.yaml linkedin.outreach decides who presses Send)")
         print(f"  After it is sent:  tools/referral.py sent {cid}"
@@ -370,6 +398,16 @@ def cmd_sent(data, cid, no_note=False):
     if awaiting(c):
         sys.exit(f"  {cid}: '{c['stage']}' is already recorded as sent on "
                  f"{last_entry(c).get('date')}. Not recording it twice.")
+    r = role_meta(c)
+    reason = blocked_reason(c, r)
+    if reason:
+        sys.exit(f"  {cid}: not recorded. {reason}")
+    if not no_note:
+        # What went out must be what passed the gates; refuse to record a failed draft.
+        _, problems, _ = current_draft(c, r)
+        if problems:
+            sys.exit(f"  {cid}: not recorded. The current '{c['stage']}' draft fails its gates "
+                     f"({'; '.join(problems)}). Fix it with tools/referral.py draft {cid} first.")
     entry = {"date": str(date.today()), "stage": c["stage"], "action": "sent"}
     if no_note:
         if c["stage"] != "connect":

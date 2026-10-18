@@ -37,8 +37,8 @@ linkedin:
   # limit notice, /hunt stops all LinkedIn actions for that run.
   account: free           # free | premium. Free: notes up to 200 characters, and only
                           # a few personalised notes a month; Premium: 300 characters.
-  outreach: send          # send: Claude sends requests and messages from your Chrome
-                          # type: Claude types each message, you press Send
+  outreach: type          # type: Claude types each message, you press Send (default, safest)
+                          # send: Claude sends requests and messages from your Chrome
                           # off:  no outreach at all
   max_invites_per_run: 10
   max_messages_per_run: 15

@@ -112,6 +112,11 @@ RESUME_HEDGES = [
     r"\bbasics\b",
     r"same ecosystem",
     r"\bexposure\b",
+    r"\(basic\)",
+    r"\(beginner\)",
+    r"\(learning\)",
+    r"\(basic knowledge\)",
+    r"\bbasic knowledge\b",
 ]
 
 # Dates a resume parser reads reliably: "Mar 2024", "03/2024", "2024", or an open end.
@@ -354,6 +359,15 @@ def check_hidden_content(pdf):
             r, g, b = (float(x) for x in m.groups())
             if min(r, g, b) > 0.90:
                 problems.append(f"page {i}: near-white fill colour {r:.2f} {g:.2f} {b:.2f}")
+        # LaTeX's \color{white} is written as grey "1 g", not RGB, and CMYK white as
+        # "0 0 0 0 k". Both were missed before; a test with \color{white} passed clean.
+        for m in re.finditer(r"(?<![\d.])([\d.]+)\s+g\b", raw):
+            if float(m.group(1)) > 0.90:
+                problems.append(f"page {i}: near-white grey fill {float(m.group(1)):.2f}")
+        for m in re.finditer(r"([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+k\b", raw):
+            c, mg, y, k = (float(x) for x in m.groups())
+            if max(c, mg, y, k) < 0.10:
+                problems.append(f"page {i}: near-white CMYK fill {c:.2f} {mg:.2f} {y:.2f} {k:.2f}")
 
         for m in re.finditer(r"(\d)\s+Tr\b", raw):
             if m.group(1) == "3":
@@ -865,12 +879,13 @@ def main():
         if not_ready:
             print(f"  Not ready: {', '.join(not_ready)}")
         print()
-        return
+        sys.exit(1 if not_ready else 0)
 
     rid = sys.argv[1]
     if not ROLE_ID.match(rid):
         sys.exit(f"role_id may only use letters, digits, '.', '_' and '-': {rid!r}")
-    audit(rid)
+    # Exit 1 when a gate fails, so a script or a run can tell NOT READY from READY.
+    sys.exit(0 if audit(rid) else 1)
 
 
 if __name__ == "__main__":

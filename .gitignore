@@ -29,6 +29,10 @@ out/_upload/*
 runs/*
 !runs/.keep
 
+# Your interview prep notes (made by /interview)
+prep/*
+!prep/.keep
+
 # Your own Claude Code approvals
 .claude/settings.local.json
 

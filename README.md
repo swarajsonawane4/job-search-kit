@@ -7,10 +7,14 @@ You type one command, `/hunt`, and it:
 2. throws out the ones you cannot get (language level, start date, wrong field),
 3. scores the rest and picks the best few,
 4. writes a one-page CV and a cover letter for each one, using only facts you gave it,
-5. checks both documents for the mistakes that get applications rejected,
+5. has a separate reviewer read each draft with fresh eyes, then checks both documents for
+   the mistakes that get applications rejected,
 6. fills each application form in its own Chrome tab and **stops before Submit**,
 7. finds two people at each company on LinkedIn and drafts a short, honest note to them,
 8. keeps a record of everything, so the next run knows what already happened.
+
+When an interview comes, `/interview <role_id>` builds your prep notes from the documents
+you actually sent.
 
 **It never submits an application, never sends an email, and never types a password.**
 You read what it did, finish anything it left for you, and press Submit yourself.
@@ -31,7 +35,9 @@ Masterarbeit), but nothing in it is tied to one country or one field. See
 - [First session: setting up your profile](#first-session-setting-up-your-profile)
 - [Running /hunt](#running-hunt)
 - [Other things you can say](#other-things-you-can-say)
+- [The reviewer](#the-reviewer)
 - [The ten document checks](#the-ten-document-checks)
+- [Interview prep](#interview-prep)
 - [LinkedIn outreach: the five stages](#linkedin-outreach-the-five-stages)
 - [Sign-ins, CAPTCHAs and passwords](#sign-ins-captchas-and-passwords)
 - [What is in the folder](#what-is-in-the-folder)
@@ -63,7 +69,7 @@ stopping to ask you questions. Anything only you can decide is collected and sho
 | 1. Catch up | Reads Gmail for confirmations, rejections and interview invitations since last time. Checks LinkedIn for replies from people you contacted. |
 | 2. Collect | Searches LinkedIn, Indeed, your watchlist of company career pages and your job-alert emails. Saves every posting it opens. |
 | 3. Filter and score | Drops roles that need a higher language level than you have, start too early, sit in the wrong field, or that you already applied to. Checks that each posting is still live on the employer's own site. Scores the rest out of 10 and keeps the best. |
-| 4. Build | Copies your closest base CV, tailors it to the posting, writes a cover letter, and runs the ten checks until both pass. |
+| 4. Build | Copies your closest base CV, tailors it to the posting, writes a cover letter, gets a second opinion from the reviewer, and runs the ten checks until both pass. |
 | 5. Fill | Opens each application in its own tab, uploads the documents, fills every field it knows from your profile, and leaves the tab open at the Submit button. |
 | 6. Outreach | Finds people at each company (hiring team, team members, alumni of your university) and drafts a connection note. |
 | 7. Hand over | Shows you the open tabs, what is left in each, who was contacted, and anything that needs your decision. |
@@ -202,6 +208,7 @@ good roles than five weak ones. It never lowers its bar to fill the quota.
 | You found a posting yourself | `Tailor and fill this one, stop before Submit, and reach two people: <URL>` |
 | You want a status overview | `Run state.py and tell me what's waiting on me` |
 | Something went wrong | `Add this to LESSONS.md with the rule it teaches: <what happened>` |
+| You got an interview | `/interview <role_id>` |
 | You got an offer | `Mark it accepted and drop the unsent roles` |
 
 You can also run the tools yourself:
@@ -216,6 +223,26 @@ You can also run the tools yourself:
 ```
 
 ---
+
+## The reviewer
+
+After a CV and cover letter are tailored, and before they are built, `/hunt` hands them to a
+separate reviewer (`.claude/agents/application-reviewer.md`). It starts with fresh context, so
+it reads the drafts the way a stranger would. It reads the saved posting, your profile and
+both drafts, spends a few searches on the employer, and returns a short, ranked list:
+
+- **MUST FIX**: a claim your profile does not back, anything on your `never_claim` list, a
+  sentence that weakens you, facts that disagree between CV and letter, or a core ask of the
+  posting that your profile covers but the documents never mention.
+- **SHOULD FIX**: a vague line where your profile has a concrete one with a number, an opening
+  that could fit any company, the posting's own words missing where an honest rephrase would
+  use them.
+- **NICE TO HAVE**: a little polish, at most three items.
+- **Not in the profile**: things the posting asks for that you do not have. These go into the
+  role's `known_gaps` for interview prep, never into the documents.
+
+The reviewer cannot edit anything, and every suggestion that adds content must name the
+profile entry it comes from. It can make an application sharper. It cannot make it less true.
 
 ## The ten document checks
 
@@ -234,11 +261,11 @@ you can never upload an old or broken version by mistake.
 | 5 | Posting saved | Keywords are checked against the real posting, saved in `jds/`, not from memory |
 | 6 | Length | The CV is exactly one page |
 | 7 | Text extraction | Broken ligatures and hyphenation that turn "workflow" into "work ow" for a parser |
-| 8 | Hidden content | Invisible text, hidden layers, and AI tool names in the PDF's file details |
+| 8 | Hidden content | White or invisible text (in RGB, grey or CMYK), hidden layers, and AI tool names in the PDF's file details |
 | 9 | Transcript | Every course named on the CV is really on your transcript |
 | 10 | ATS parser | Contact details, standard headings, readable dates, single column, correct reading order |
 
-It also reports, without blocking: hedged skills ("Python (basic)"), em dashes, and how many
+It also reports, without blocking: hedged skills ("Python (basic)", "familiar", "exposure"), em dashes, and how many
 of the posting's must-have keywords the CV covers.
 
 It also makes a second set of files without clickable links in `no-links/`, because SAP
@@ -246,6 +273,37 @@ SuccessFactors rejects PDFs that contain links.
 
 Every one of these checks exists because the mistake really happened and cost an
 application. The stories are in `LESSONS.md`.
+
+`apply.py` exits with code 0 when a role is ready and 1 when it is not, so you can use it in
+your own scripts.
+
+## Interview prep
+
+When you get an invitation, type:
+
+```
+/interview <role_id>
+```
+
+It reads the CV and cover letter you actually sent (from `out/_upload/<role_id>/`), the saved
+posting, your profile with its evidence lines, the role's `known_gaps`, and the invitation in
+Gmail. It looks up the team and the interviewers' public professional profiles. Then it writes
+`prep/<role_id>.md` with:
+
+1. **The interview**: date, time, format, who you will meet.
+2. **The role in three lines**, in the posting's own words.
+3. **Your 60-second intro**, written to be said out loud: short sentences, plain words.
+4. **A story bank**: five or six real stories from your profile, each mapped to what they ask.
+5. **Likely questions**, with what to say and which story to use.
+6. **The hard questions**: every known gap with an honest answer, a bridge to what you do
+   have, and how you would close it. Plus anything on your CV they might probe, such as a weak
+   grade in their subject.
+7. **Questions to ask them**, specific to this team.
+8. **A logistics checklist.**
+
+It never invents a fact and never claims anything on your `never_claim` list. At the end it
+offers a mock interview: it asks the questions one at a time and gives honest feedback.
+`prep/` is personal and git-ignored.
 
 ---
 
@@ -282,7 +340,7 @@ can be restricted is yours. In `run.yaml` you choose:
 | --- | --- |
 | `type` (recommended) | Claude types each note into LinkedIn and leaves it unsent. You read it and press Send. |
 | `send` | Claude sends connection requests and messages itself, within the limits in `run.yaml`. |
-| `off` | No outreach. LinkedIn is still used for searching unless you remove it from `search.sources`. |
+| `off` | No outreach. `referral.py` refuses to draft or record anything. LinkedIn is still used for searching unless you remove it from `search.sources`. |
 
 Whatever you choose, the run keeps the numbers small (`max_invites_per_run`,
 `max_messages_per_run`, `max_profile_views_per_run`) and stops every LinkedIn action at the
@@ -313,6 +371,8 @@ first CAPTCHA, warning or limit notice.
 | `START_HERE.md` | A shorter quick-start guide |
 | `.claude/skills/hunt/` | The `/hunt` run, step by step |
 | `.claude/skills/resume-tailor/` | The rules for tailoring a CV and cover letter honestly |
+| `.claude/skills/interview/` | The `/interview` command |
+| `.claude/agents/application-reviewer.md` | The reviewer that gives each application a second opinion |
 | `.claude/settings.json` | Tools pre-approved for `/hunt`; sending email is blocked |
 | `tools/` | The Python tools (see below) |
 | `template/` | ATS-safe LaTeX templates for the CV and cover letter |
@@ -330,7 +390,7 @@ first CAPTCHA, warning or limit notice.
 | `apply.py` | Builds the PDFs, runs the ten checks, and stages the upload files |
 | `fit_one_page.py` | Trims the longest skills line until the CV fits on one page, without removing any must-have keyword |
 | `state.py` | One-screen overview: what is live, waiting, rejected, and who you are talking to |
-| `referral.py` | Drafts, checks and records LinkedIn outreach. It never sends anything itself |
+| `referral.py` | Drafts, checks and records LinkedIn outreach. It never sends anything itself, refuses to record a message whose draft failed its checks, and does nothing while outreach is `off` |
 | `check_profile.py` | Says whether your profile is ready, and warns when your availability is out of date |
 | `init_workspace.py` | Creates your personal files from the examples (`setup.sh` runs it) |
 | `check_share.py` | Checks that nothing personal is about to be pushed to git |
@@ -348,6 +408,7 @@ first CAPTCHA, warning or limit notice.
 | `referrals/contacts.yaml` | The people you contacted and where each conversation stands |
 | `portals/accounts.csv` | Portals you have accounts on (usernames only) |
 | `runs/` | One log per `/hunt` run |
+| `prep/` | Interview prep notes made by `/interview` |
 
 ---
 

@@ -80,6 +80,8 @@ does all of this itself as its first phase.
 | Path | What |
 | --- | --- |
 | `.claude/skills/hunt/SKILL.md` | The `/hunt` run: phases, rules, scoring, outreach, hand-over |
+| `.claude/agents/application-reviewer.md` | Read-only second opinion on each tailored CV and letter, used in `/hunt` phase 4 |
+| `.claude/skills/interview/SKILL.md` | `/interview <role_id>`: prep notes in `prep/` from what was actually sent |
 | `run.yaml` | Searches, watchlist, roles and contacts per run, LinkedIn mode and limits |
 | `runs/` | One log per run; reread the newest one to resume an unfinished run |
 | `SWEEP.md` | Why each source, and the rules that decide whether an application survives |
